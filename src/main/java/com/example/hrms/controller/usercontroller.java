@@ -1,18 +1,17 @@
 package com.example.hrms.controller;
 
+import com.example.hrms.entity.user;
+import com.example.hrms.service.userService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.example.hrms.pojo.user;
-import com.example.hrms.service.userService;
-import com.example.hrms.service.userServiceimpl;
 
 @RestController
-public class Usercontroller {
+public class usercontroller {
     @Autowired
     private userService userService ;
-    @RequestMapping("/getUser")
-    public user getUser(String username){
-        return userService.getUser(username);
+    @RequestMapping("/findById")
+    public user findById(int user_id){
+        return userService.findById(user_id);
     }
 }
