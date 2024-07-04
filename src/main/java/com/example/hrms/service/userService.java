@@ -1,7 +1,10 @@
 package com.example.hrms.service;
 
-import com.example.hrms.pojo.user;
+
+import com.example.hrms.entity.user;
 
 public interface userService {
-    public user getUser(String username);
+
+    public user findById(int user_id);
+
 }
