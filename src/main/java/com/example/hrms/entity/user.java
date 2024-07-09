@@ -14,4 +14,6 @@ public class user {
     private String city;
     private String area;
     private String street;
+    private int age;
+    private String role;
 }

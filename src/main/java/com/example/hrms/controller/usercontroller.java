@@ -1,17 +1,57 @@
 package com.example.hrms.controller;
 
+import com.example.hrms.entity.Result;
 import com.example.hrms.entity.user;
 import com.example.hrms.service.userService;
+import com.example.hrms.utils.JwtUtil;
+import com.example.hrms.utils.MD5Utils;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
+@RequestMapping("/user")
+@Validated
 public class usercontroller {
     @Autowired
     private userService userService ;
-    @RequestMapping("/findById")
-    public user findById(int user_id){
-        return userService.findById(user_id);
+    @PostMapping("/register")
+    public Result register(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{6,20}$") String password){
+
+        //用户名是否被占用
+        if (userService.findByUsername(username) == null) {
+            userService.register(username, password);
+            return Result.success();
+        }
+        //注册
+        else {
+            return Result.error("用户名已被占用");
+        }
+
+    }
+    @PostMapping("/login")
+    public Result<String> login(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{6,20}$") String password){
+        //用户名是否存在
+        password = MD5Utils.getMD5String(password);
+        user loginuser = userService.findByUsername(username);
+        if (loginuser == null) {
+            return Result.error("用户名错误");
+        }
+        //密码是否正确
+        else if (loginuser.getPassword().equals(password)){
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("username", username);
+            claims.put("user_id", loginuser.getUser_id());
+            String token =  JwtUtil.getToken(claims);
+            return Result.success(token);
+        }
+
+        else return Result.error("密码错误");
     }
 }
