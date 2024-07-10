@@ -11,4 +11,6 @@ public interface userService {
     public user findByUsername(String username);
     //注册
     public void register(String username,String password);
+    //更新用户基本信息
+    public void update(user user);
 }
