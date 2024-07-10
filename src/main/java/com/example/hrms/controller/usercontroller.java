@@ -3,12 +3,16 @@ package com.example.hrms.controller;
 import com.example.hrms.entity.Result;
 import com.example.hrms.entity.user;
 import com.example.hrms.service.userService;
-import com.example.hrms.utils.*;
-
+import com.example.hrms.utils.JwtUtil;
+import com.example.hrms.utils.MD5Utils;
+import com.example.hrms.utils.ThreadLocalUtil;
 import jakarta.validation.constraints.Pattern;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,8 +65,36 @@ public class usercontroller {
        return Result.success(user);
     }
     @PutMapping("/update")
-    public Result update(@RequestBody user user){
+    public Result update(@RequestBody @Validated user user){
         userService.update(user);
+        return Result.success();
+    }
+    @PatchMapping("/updateAvatar")
+    public Result updateAvatar(@RequestParam @URL String avatarUrl){
+        userService.updateAvatar(avatarUrl);
+        return Result.success();
+    }
+    @PatchMapping("/updatePwd")
+    public Result updatePassword(@RequestBody Map<String,String> params){
+        //校验参数
+        String oldPwd = params.get("old_Pwd");
+        String newPwd = params.get("new_Pwd");
+        String rePwd = params.get("re_Pwd");
+        if (!StringUtils.hasLength(oldPwd) || !StringUtils.hasLength(newPwd) || !StringUtils.hasLength(rePwd)){
+            return Result.error("缺失必要参数");
+        }
+        //校验新密码和原密码是否相同
+        Map<String, Object> claims = ThreadLocalUtil.get();
+        Integer user_id = (Integer) claims.get("user_id");
+        user user = userService.findById(user_id);
+        if (!user.getPassword().equals(MD5Utils.getMD5String(oldPwd))){
+            return Result.error("原密码填写不正确");
+        }
+        if (!newPwd.equals(rePwd)){
+            return Result.error("两次填写的新密码不一致");
+        }
+        userService.updatePwd(newPwd);
+
         return Result.success();
     }
 }
