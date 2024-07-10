@@ -32,4 +32,8 @@ public class userServiceImpl implements userService {
         //注册
         userDao.register(username,MD5String);
     }
+    @Override
+    public void update(user user){
+        userDao.update(user);
+    }
 }

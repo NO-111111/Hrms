@@ -3,15 +3,12 @@ package com.example.hrms.controller;
 import com.example.hrms.entity.Result;
 import com.example.hrms.entity.user;
 import com.example.hrms.service.userService;
-import com.example.hrms.utils.JwtUtil;
-import com.example.hrms.utils.MD5Utils;
+import com.example.hrms.utils.*;
+
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,5 +50,19 @@ public class usercontroller {
         }
 
         else return Result.error("密码错误");
+    }
+    @GetMapping("/userinfo")
+    public Result<user> userinfo(){
+
+       Map<String, Object> claims = ThreadLocalUtil.get();
+       String username =(String) claims.get("username");
+       user user = userService.findByUsername(username);
+
+       return Result.success(user);
+    }
+    @PutMapping("/update")
+    public Result update(@RequestBody user user){
+        userService.update(user);
+        return Result.success();
     }
 }
