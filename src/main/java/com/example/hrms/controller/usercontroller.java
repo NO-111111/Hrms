@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
 @RestController
 @RequestMapping("/user")
 @Validated
+
 public class usercontroller {
     @Autowired
     private userService userService ;
@@ -88,12 +89,12 @@ public class usercontroller {
         Integer user_id = (Integer) claims.get("user_id");
         user user = userService.findById(user_id);
         if (!user.getPassword().equals(MD5Utils.getMD5String(oldPwd))){
-            return Result.error("原密码填写不正确");
+            return Result.error("原密码错误");
         }
         if (!newPwd.equals(rePwd)){
             return Result.error("两次填写的新密码不一致");
         }
-        userService.updatePwd(newPwd);
+        
 
         return Result.success();
     }
